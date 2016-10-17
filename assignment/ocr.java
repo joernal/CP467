@@ -16,37 +16,59 @@ import java.util.List;
 
 public class ocr {
 
+  public static BufferedImage get_image( BufferedImage img, String name ){
+
+        try {
+          img = ImageIO.read(new File(name));
+        } catch (IOException e){
+          System.out.println("Image not found!");
+        }
+
+        return img;
+  }
+
   public static void main(String []args){
 
     Scanner reader = new Scanner(System.in);
 
-    System.out.println("--- Image Processing and Pattern Recognition ---");
-    System.out.println("1. Count Symbols and Pixels");
-    System.out.println("2. Convolute image");
-    System.out.println("3. Scale image down");
-    System.out.println("Q to quit");
+    BufferedImage img = null;
+    String image = "image2.bmp";
 
-    System.out.println("Select an option: ");
+    img = get_image(img, image);
 
-    String input = reader.next();
+    String input = "";
 
-    while (!input.equals("Q")){
+    do {
+      // Menu
+      System.out.println("--- Image Processing and Pattern Recognition ---");
+      System.out.println("0. Change Image");
+      System.out.println("1. Count Symbols and Pixels");
+      System.out.println("2. Convolute image");
+      System.out.println("3. Scale image down");
+      System.out.println("Q to quit");
 
-      BufferedImage img = null;
-      try {
-        img = ImageIO.read(new File("image2.bmp"));
-      } catch (IOException e){
-        System.out.println("Image not found!");
-      }
+      // Input
+      System.out.print("Select an option: ");
+      input = reader.next();
 
-      if (input.equals("1")){
+      //Change image
+      if (input.equals("0")){
+        System.out.println("------------------------------------");
+        System.out.print("Enter path to image: ");
+        image = reader.next();
+        img = get_image(img, image);
+        System.out.println("------------------------------------");
+      // Number of Symbols and black pixels
+      } else if (input.equals("1")){
         System.out.println("------------------------------------");
         count_symbols(img);
         System.out.println("------------------------------------");
+      // Convolute Image
       } else if (input.equals("2")){
         System.out.println("------------------------------------");
         convolute(img);
         System.out.println("------------------------------------");
+      // Scale image
       } else if (input.equals("3")){
         System.out.println("------------------------------------");
         System.out.print("Enter width: ");
@@ -59,15 +81,7 @@ public class ocr {
         System.out.println("------------------------------------");
       }
 
-      System.out.println("--- Image Processing and Pattern Recognition ---");
-      System.out.println("1. Count Symbols and Pixels");
-      System.out.println("2. Convolute image");
-      System.out.println("3. Scale image down");
-      System.out.println("Q to quit");
-
-      System.out.println("Select an option: ");
-      input = reader.next();
-    }
+    } while (!input.equals("Q"));
   }
 
   public static List<symbol> merge(List<symbol> syms, int i, int j, pixel pix){
