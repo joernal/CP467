@@ -182,22 +182,27 @@ public class ocr {
 
     int[] pixels = new int[colWindow*rowWindow];
     double graylevel;
-    int sum;
+    double sum;
     for (int i = 0; i < newImage.getWidth(); i++){
       for (int j = 0; j < newImage.getHeight(); j++){
         pixels = img.getRGB(((int)(i*colScaleRatio)), ((int)(j*rowScaleRatio)), colWindow, rowWindow, null, 0, colWindow);
         sum = 0;
         for (int p: pixels){
-          if (p == Color.BLACK.getRGB()){
-            sum++;
-          }
+            int r = (p >> 16) & 0xFF;
+            int g = (p >> 8) & 0xFF;
+            int b = (p & 0xFF);
+
+            int gray = (r + g + b) / 3;  // get gray value
+            System.out.print(gray+" ");
+
+            sum=sum+gray;
         }
-        graylevel = ((double)sum/pixels.length);
+        graylevel = ((sum/pixels.length));
         if (graylevel > threshold){
-          newImage.setRGB(i,j,Color.BLACK.getRGB());
-        } else {
-          newImage.setRGB(i,j,Color.WHITE.getRGB());
+          graylevel=graylevel;
+          newImage.setRGB(i,j,(int)graylevel*65536+(int)graylevel*256+(int)graylevel);
         }
+        System.out.println(sum+"/"+pixels.length+"="+graylevel);
       }
     }
     try{
