@@ -7,7 +7,7 @@ This is an assignment to create an Optical Character Recognition system. To bett
 - Scaling
 - Thinning
 
-This assignment is a collaboration of three students: Joe Fung, ALi Ahmed, and Razi Abbasi.
+This assignment is a collaboration of three students: Joe Fung, Ali Ahmed, and Razi Abbasi.
 
 Screenshot:
 Original image:
