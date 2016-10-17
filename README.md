@@ -14,10 +14,10 @@ Original image:
 ![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/image2.bmp)
 
 Scaled down image:
-![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/scale.bmp)
+![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/scaled.bmp)
 
 Original image:
-![alt tag](httpshttps://raw.githubusercontent.com/joernal/CP467/edit-1/image.bmp)
+![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/image.bmp)
 
 Convoluted image:
 ![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/convoluted.bmp)
