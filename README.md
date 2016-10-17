@@ -11,14 +11,14 @@ This assignment is a collaboration of three students: Joe Fung, Ali Ahmed, and R
 
 Screenshot:
 Original image:
-![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/image2.bmp)
+![alt tag](https://raw.githubusercontent.com/joernal/CP467/master/image2.bmp)
 
 Scaled down image:
-![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/scaled.bmp)
+![alt tag](https://raw.githubusercontent.com/joernal/CP467/master/scaled.bmp)
 
 Original image:
-![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/image.bmp)
+![alt tag](https://raw.githubusercontent.com/joernal/CP467/master/image.bmp)
 
 Convoluted image:
-![alt tag](https://raw.githubusercontent.com/joernal/CP467/edit-1/convoluted.bmp)
+![alt tag](https://raw.githubusercontent.com/joernal/CP467/master/convoluted.bmp)
 
