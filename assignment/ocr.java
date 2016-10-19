@@ -1,16 +1,11 @@
 package assignment;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
+import java.awt.*; 
+import java.awt.event.*; 
+import java.awt.image.*; 
+import java.io.*; 
 import java.util.*;
-
-import javax.imageio.*;
-import javax.swing.*;
-
-import assignment.pixel;
-import assignment.symbol;
+import javax.imageio.*; 
 import java.util.List;
 
 
@@ -51,7 +46,7 @@ public class ocr {
       System.out.print("Select an option: ");
       input = reader.next();
 
-      //Change image
+      // Change image
       if (input.equals("0")){
         System.out.println("------------------------------------");
         System.out.print("Enter path to image: ");
@@ -80,7 +75,6 @@ public class ocr {
         scale_down(img, inputWidth, inputHeight, threshold);
         System.out.println("------------------------------------");
       }
-
     } while (!input.equals("Q"));
   }
 
@@ -95,7 +89,7 @@ public class ocr {
 
   public static void count_symbols( BufferedImage img ){
 
-    List<symbol> syms = new ArrayList<symbol>();
+    ArrayList<symbol> symbols = new ArrayList<symbol>();
 
     int counter = 0;
 
@@ -106,13 +100,13 @@ public class ocr {
 
     if (img.getWidth() > 0){
       int grayscale = 0;
-      for (int yPixel = 0; yPixel < img.getHeight(); yPixel++){
-        for (int xPixel = 0 ; xPixel < img.getWidth(); xPixel++){
+      for (int xPixel = 0; xPixel < img.getWidth(); xPixel++){
+        for (int yPixel = 0 ; yPixel < img.getHeight(); yPixel++){
           int color = img.getRGB(xPixel, yPixel);
           if (color==Color.BLACK.getRGB()){
           	counter++;
           	pixel pix = new pixel(xPixel, yPixel, grayscale);
-          	if (syms.size()!=0){
+          	if (syms.size() != 0){
           		outerloop:
           		for (int i = 0; i < syms.size(); i++){
           			if (syms.get(i).searchSymbol(pix)==true){
@@ -192,7 +186,7 @@ public class ocr {
             int g = (p >> 8) & 0xFF;
             int b = (p & 0xFF);
 
-            int gray = (r + g + b) / 3;  // get gray value
+            int gray = (r + g + b) / 3; // get gray value
             System.out.print(gray+" ");
 
             sum=sum+gray;
@@ -243,7 +237,7 @@ public class ocr {
 		        int g = (rgb >> 8) & 0xFF;
 		        int b = (rgb & 0xFF);
 
-		        int gray = (r + g + b) / 3;  // get gray value
+		        int gray = (r + g + b) / 3; // get gray value
 
 		        pixData[xPixel][yPixel] = gray;
 
@@ -285,8 +279,6 @@ public class ocr {
 	  } catch (IOException e) {
 	    System.out.println("Image not saved!");
 	  }
-
-
   }
 
 }
