@@ -10,7 +10,7 @@ import java.util.List;
 
 
 public class ocr {
-    
+	public static boolean continueIteration = true;
     public static BufferedImage get_image( BufferedImage img, String name ){
 	
         try {
@@ -40,6 +40,7 @@ public class ocr {
 	    System.out.println("1. Count Symbols and Pixels");
 	    System.out.println("2. Convolute image");
 	    System.out.println("3. Scale image down");
+	    System.out.println("5. Thin the image");
 	    System.out.println("Q to quit");
 	    
 	    // Input
@@ -74,7 +75,12 @@ public class ocr {
 		double threshold = reader.nextDouble();
 		scale_down(img, inputWidth, inputHeight, threshold);
 		System.out.println("------------------------------------");
-	    }
+	    }else if (input.equals("5")){
+		System.out.println("------------------------------------");
+		thin(img);
+		System.out.println("------------------------------------");
+		// Thin Image
+		}
 	} while (!input.equals("Q"));
     }
     
@@ -105,7 +111,7 @@ public class ocr {
 		    int color = img.getRGB(xPixel, yPixel);
 		    if (color==Color.BLACK.getRGB()){
 			counter++;
-			Pixel pix = new Pixel(xPixel, yPixel, grayscale);
+			Pixel pix = new Pixel(xPixel, yPixel, grayscale, false);
 			if (syms.size() != 0){
 			    outerloop:
 			    for (int i = 0; i < syms.size(); i++){
@@ -207,6 +213,143 @@ public class ocr {
 	}
     }
     
+    public static void thin(BufferedImage img){
+    	// Apply ZS algorithm
+    	int padding = 1;
+    	BufferedImage newImage = new BufferedImage(img.getWidth()+2*padding, img.getHeight()+2*padding, img.getType());
+    	// add padding around image
+    	Graphics g1 = newImage.getGraphics();
+    	
+    	g1.setColor(Color.white);
+    	g1.fillRect(0,0,img.getWidth()+2*padding,img.getHeight()+2*padding);
+    	g1.drawImage(img, padding, padding, null);
+    	g1.dispose();
+    	
+    	
+    	int rgb;
+    	List<Pixel> pixels = new ArrayList<Pixel>();
+    	for (int yPixel = 0; yPixel < newImage.getHeight(); yPixel++){
+    	    
+    	    for (int xPixel = 0 ; xPixel < newImage.getWidth(); xPixel++){
+    		rgb = newImage.getRGB(xPixel, yPixel);
+    		
+    		int r = (rgb >> 16) & 0xFF;
+    		int g = (rgb >> 8) & 0xFF;
+    		int b = (rgb & 0xFF);
+    		
+    		int gray = (r + g + b) / 3; // get gray value
+    		
+    		pixels.add(new Pixel(xPixel, yPixel, gray, false));
+    		
+    	    }
+    	}
+    	
+
+    	while(continueIteration == true){
+    		int iteration = 1;
+    		pixels = ZSRules(pixels, iteration, img, newImage);
+    		pixels = delete(pixels, img, newImage);
+    		iteration = 2;
+    		pixels = ZSRules(pixels, iteration, img, newImage);
+    		pixels = delete(pixels, img, newImage);
+    	}
+    	
+    	for (int y = 0; y < newImage.getHeight(); y++){
+    	    for (int x = 0 ; x < newImage.getWidth(); x++){    		
+    		newImage.setRGB(x, y, ((int) (pixels.get(newImage.getWidth()*y + x).grayscale) * 0x00010101) );
+    		
+    	    }
+    	}
+    	
+    	
+    	
+    	try {
+    	    File outputfile = new File("thinned.bmp");
+    	    ImageIO.write(newImage, "bmp", outputfile);
+    	    Desktop.getDesktop().open(outputfile);
+    	    System.out.println("Thinned image saved as thinned.bmp");
+    	} catch (IOException e) {
+    	    System.out.println("Image not saved!");
+    	}
+    	
+    }
+    
+    public static List<Pixel> delete(List<Pixel> pixels, BufferedImage img, BufferedImage newImage){
+		// Delete
+    	
+    	continueIteration = false;
+    	
+		for(int y = 1; y <= newImage.getHeight()-1; y++){
+			for(int x = 1; x <= newImage.getWidth()-1; x++){
+				if (pixels.get(newImage.getWidth()*y + x).delete){
+					pixels.get(newImage.getWidth()*y + x).grayscale = 255;
+					
+					continueIteration = true;
+					pixels.set(newImage.getWidth()*y + x, new Pixel(pixels.get(newImage.getWidth()*y + x).x, pixels.get(newImage.getWidth()*y + x).y, 255, false));
+					
+				}
+			}
+		}
+		
+		return pixels;
+    }
+    
+    public static List<Pixel> ZSRules(List<Pixel> pixels, int iteration, BufferedImage img, BufferedImage newImage){
+    	
+		// Iteration 1
+		for(int y = 1; y < newImage.getHeight()-1; y++){
+			for(int x = 1; x < newImage.getWidth()-1; x++){
+				int j = newImage.getWidth()*y;
+				int p1 = pixels.get(j + x).grayscale;
+				int p2 = pixels.get(j + x - newImage.getWidth()).grayscale;
+				int p3 = pixels.get(j + x - newImage.getWidth()+1).grayscale;
+				int p4 = pixels.get(j + x + 1).grayscale;
+				int p5 = pixels.get(j + x + 1 + newImage.getWidth()).grayscale;
+				int p6 = pixels.get(j + x + newImage.getWidth()).grayscale;
+				int p7 = pixels.get(j + x + newImage.getWidth()-1).grayscale;
+				int p8 = pixels.get(j + x - 1).grayscale;
+				int p9 = pixels.get(j + x - newImage.getWidth() - 1).grayscale;
+				
+				int[] grays = {p2,p3,p4,p5,p6,p7,p8,p9};
+				if(p1 < 255){
+					int blackCounter = 0;
+					int zeroOneCounter = 0;
+					for (int i = 0; i < grays.length; i++){
+						if (grays[i] < 255){
+							blackCounter++;
+						}
+						if (i != 7 && grays[i]==255 && grays[i+1]<255){
+							zeroOneCounter++;
+						}
+					}
+					if (grays[7]==255 && grays[0] <255){
+						zeroOneCounter++;
+					}
+					
+					if (iteration == 1){
+						if((blackCounter >= 2 && blackCounter <= 6)
+								&&(p2 == 255 || p4 == 255 || p6 == 255)
+								&&(p4 == 255 || p6 == 255 || p8 == 255)
+								&&(zeroOneCounter == 1)){
+									pixels.get(newImage.getWidth()*y + x).delete = true;
+									}
+					}
+					// Iteration 2
+					if (iteration == 2){
+						if((blackCounter >= 2 && blackCounter <= 6)
+								&&(p2 == 255 || p4 == 255 || p8 == 255)
+								&&(p2 == 255 || p6 == 255 || p8 == 255)
+								&&(zeroOneCounter == 1)){
+									pixels.get(newImage.getWidth()*y + x).delete = true;
+									}
+					}
+				}
+
+
+			}
+		}
+    	return pixels;
+    }
     
     public static void convolute( BufferedImage img ){
 
