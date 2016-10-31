@@ -45,6 +45,7 @@ public class ocr {
       System.out.println("1. Count Symbols and Pixels");
       System.out.println("2. Convolute image");
       System.out.println("3. Scale image down");
+      System.out.println("4. Apply edge detection");
       System.out.println("Q to quit");
 
       // Input
@@ -79,11 +80,16 @@ public class ocr {
         double threshold = reader.nextDouble();
         scale_down(img, inputWidth, inputHeight, threshold);
         System.out.println("------------------------------------");
+      } else if (input.equals("4")) {
+      // Edge detection
+          System.out.println("------------------------------------");
+          edgeDetection(img);
       }
 
     } while (!input.equals("Q"));
   }
 
+  // Merge symbols
   public static List<symbol> merge(List<symbol> syms, int i, int j, pixel pix){
 	  for (int k = 0; k<syms.get(i).list_of_pixels.size(); k++){
 		  syms.get(j).list_of_pixels.add(syms.get(i).list_of_pixels.get(k));
@@ -93,6 +99,7 @@ public class ocr {
 	  return syms;
   }
 
+  // Count symbols
   public static void count_symbols( BufferedImage img ){
 
     List<symbol> syms = new ArrayList<symbol>();
@@ -151,12 +158,8 @@ public class ocr {
           		s.addPixel(pix);
           		syms.add(s);
           	}
-
-
           }
-
         }
-
       }
       System.out.println("Total number of Black Pixels: " + counter);
 
@@ -167,7 +170,6 @@ public class ocr {
     } else {
       System.out.println("No Image!");
     }
-
   }
 
   public static void scale_down( BufferedImage img, int inputWidth, int inputHeight, double threshold ){
@@ -231,7 +233,7 @@ public class ocr {
 	  g1.drawImage(img, padding, padding, null);
 	  g1.dispose();
 
-
+    // Convert image data to grayscale
 	  int rgb;
 	  double[][] pixData = new double[newImage.getWidth()][newImage.getHeight()];
       for (int yPixel = 0; yPixel < newImage.getHeight(); yPixel++){
@@ -246,9 +248,6 @@ public class ocr {
 		        int gray = (r + g + b) / 3;  // get gray value
 
 		        pixData[xPixel][yPixel] = gray;
-
-
-
 		    }
 	  }
 
@@ -289,4 +288,68 @@ public class ocr {
 
   }
 
+  // Edge detection convolution (copy and paste from convolution for now, will fix later)
+  public static void edgeDetection (BufferedImage img){
+    int padding = 2;
+
+	  List<pixel> pixels = new ArrayList<pixel>();
+
+	  BufferedImage newImage = new BufferedImage(img.getWidth()+2*padding, img.getHeight()+2*padding, img.getType());
+	  // add padding around image
+	  Graphics g1 = newImage.getGraphics();
+
+	  g1.setColor(Color.white);
+	  g1.fillRect(0,0,img.getWidth()+2*padding,img.getHeight()+2*padding);
+	  g1.drawImage(img, padding, padding, null);
+	  g1.dispose();
+
+    // Convert image data to grayscale
+	  int rgb;
+	  double[][] pixData = new double[newImage.getWidth()][newImage.getHeight()];
+      for (int yPixel = 0; yPixel < newImage.getHeight(); yPixel++){
+
+          for (int xPixel = 0 ; xPixel < newImage.getWidth(); xPixel++){
+		        rgb = newImage.getRGB(xPixel, yPixel);
+
+		        int r = (rgb >> 16) & 0xFF;
+		        int g = (rgb >> 8) & 0xFF;
+		        int b = (rgb & 0xFF);
+
+		        int gray = (r + g + b) / 3;  // get gray value
+
+		        pixData[xPixel][yPixel] = gray;
+		    }
+	  }
+
+    // Modified section from convolution
+      for (int y = 0; y < newImage.getHeight(); y++){
+    	  for (int x=0; x < newImage.getWidth()-2; x++){
+    		  pixData[x][y] = (-1)*pixData[x][y] +
+    				  			0*pixData[x+1][y] +
+    				  			1*pixData[x+2][y];
+    		  newImage.setRGB(x, y, ((int) (pixData[x+2][y]) * 0x00010101) );
+    	  }
+      }
+
+      for (int x=0; x < newImage.getWidth(); x++){
+    	  for (int y = 0; y < newImage.getHeight()-2; y++){
+    		  pixData[x][y] = (-1)*pixData[x][y] +
+    				  			0*pixData[x][y+1] +
+    				  			1*pixData[x][y+2];
+    		  newImage.setRGB(x, y, ((int) (pixData[x][y+2]) * 0x00010101) );
+    	  }
+      }
+
+	  newImage = newImage.getSubimage(2, 2, img.getWidth(), img.getHeight());
+
+
+	  try {
+		  File outputfile = new File("convoluted.bmp");
+		  ImageIO.write(newImage, "bmp", outputfile);
+      Desktop.getDesktop().open(outputfile);
+      System.out.println("Convoluted image saved as convoluted.bmp");
+	  } catch (IOException e) {
+	    System.out.println("Image not saved!");
+	  }
+  }
 }
