@@ -9,12 +9,12 @@ import javax.imageio.ImageIO;
 
 public class Symbol {
     public ArrayList<Pixel> listOfPixels = new ArrayList<Pixel>();
-    private int extremeTop, extremeBottom, extremeLeft, extremeRight;
+    //private int extremeTop, extremeBottom, extremeLeft, extremeRight;
     
     public Symbol( Pixel newPixel ) {
 	this.listOfPixels.add( newPixel );
-	this.extremeTop = this.extremeBottom = newPixel.y;
-	this.extremeLeft = this.extremeRight = newPixel.x;
+	//this.extremeTop = this.extremeBottom = newPixel.y;
+	//this.extremeLeft = this.extremeRight = newPixel.x;
     }
     
     public void addPixel( Pixel newPixel ){
@@ -42,6 +42,50 @@ public class Symbol {
 	    }
 	}
 	return result;
+    }
+    
+    public int getExtremeTop(){
+    	int top = this.listOfPixels.get(0).y;
+    	for (int i = 0; i < this.listOfPixels.size(); i++){
+    		int y = this.listOfPixels.get(i).y;
+    		if (y < top){
+    			top = y; 
+    		}
+    	}
+    	return top;
+    }
+    
+    public int getExtremeBottom(){
+    	int bottom = this.listOfPixels.get(0).y;
+    	for (int i = 0; i < this.listOfPixels.size(); i++){
+    		int y = this.listOfPixels.get(i).y;
+    		if (y > bottom){
+    			bottom = y; 
+    		}
+    	}
+    	return bottom;
+    }
+    
+    public int getExtremeLeft(){
+    	int left = this.listOfPixels.get(0).x;
+    	for (int i = 0; i < this.listOfPixels.size(); i++){
+    		int x = this.listOfPixels.get(i).x;
+    		if (x < left){
+    			left = x; 
+    		}
+    	}
+    	return left;
+    }
+    
+    public int getExtremeRight(){
+    	int right = this.listOfPixels.get(0).x;
+    	for (int i = 0; i < this.listOfPixels.size(); i++){
+    		int x = this.listOfPixels.get(i).x;
+    		if (x > right){
+    			right = x; 
+    		}
+    	}
+    	return right;
     }
     
 }
