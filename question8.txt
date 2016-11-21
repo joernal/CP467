@@ -1,4 +1,4 @@
-Descriptions of numbers 0-9 respectively using Assignment 7
+Descriptions of numbers using Assignment 7
 
 1 =		[0.3094099, 0.7033493, 0.0, 0.0, 0.61244017, 0.0, 0.28548643, 0.72727275, 0.28548643]
 2 =	  [0.3121212, 0.34848484, 0.55454546, 0.0, 0.25, 0.3969697, 0.5863636, 0.4969697, 0.28787878]
