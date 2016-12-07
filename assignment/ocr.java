@@ -10,31 +10,33 @@ import java.util.List;
 
 
 public class ocr {
-	public static boolean continueIteration = true;
-	public static ArrayList<Symbol> syms = new ArrayList<Symbol>();
-    public static BufferedImage get_image( BufferedImage img, String name ){
+    public static boolean continueIteration = true;
+    public static ArrayList<Symbol> syms = new ArrayList<Symbol>();
 
+    // This Is to change the Image while the program is running
+    public static BufferedImage get_image( BufferedImage img, String name ){	
         try {
 	    img = ImageIO.read(new File(name));
         } catch (IOException e){
 	    System.out.println("Image not found!");
         }
-
         return img;
     }
 
+    // Call the main function when the program runs
     public static void main(String []args){
 
-	Scanner reader = new Scanner(System.in);
+	Scanner reader = new Scanner(System.in); // To read input from keyboard
 
-	BufferedImage img = null;
+	BufferedImage img = null; // Empty image var
 	String image = "image2.bmp";
 
-	img = get_image(img, image);
+	img = get_image(img, image); 
 
 	String input = "";
 
-	do {
+	
+	do { 
 	    // Menu
 	    System.out.println("--- Image Processing and Pattern Recognition ---");
 	    System.out.println("0. Change Image");
@@ -78,24 +80,25 @@ public class ocr {
 		double threshold = reader.nextDouble();
 		scale_down(img, inputWidth, inputHeight, threshold);
 		System.out.println("------------------------------------");
-	} else if (input.equals("4")){
-				System.out.println("------------------------------------");
-				edgeDetection(img);
-				System.out.println("------------------------------------");
+	    } else if (input.equals("4")){
+		System.out.println("------------------------------------");
+		edgeDetection(img);
+		System.out.println("------------------------------------");
 	    }else if (input.equals("5")){
 		System.out.println("------------------------------------");
 		thin(img);
 		System.out.println("------------------------------------");
 		// Thin Image
-		}else if (input.equals("6")){
+	    }else if (input.equals("6")){
 		System.out.println("------------------------------------");
 		featureVector(img);
 		System.out.println("------------------------------------");
 		// Find feature vectors of the image
-		}
+	    }
 	} while (!input.equals("Q"));
     }
 
+    // A funtion to merge symobls
     public static ArrayList<Symbol> merge( ArrayList<Symbol> syms, int i, int j, Pixel pix){
 	for (int k = 0; k<syms.get(i).listOfPixels.size(); k++){
 	    syms.get(j).listOfPixels.add(syms.get(i).listOfPixels.get(k));
@@ -105,81 +108,76 @@ public class ocr {
 	return syms;
     }
 
+    // To create symbols in image
     public static void count_symbols( BufferedImage img ){
-
-
 
 	int counter = 0;
 
 	int merge1index = -1;
 	int merge2index = -1;
-
+	
 	boolean value = false;
-
+	
 	if (img.getWidth() > 0){
 	    int grayscale = 0;
+	    // For every Column
 	    for (int xPixel = 0; xPixel < img.getWidth(); xPixel++){
+		// For every Row
 		for (int yPixel = 0 ; yPixel < img.getHeight(); yPixel++){
-		    int color = img.getRGB(xPixel, yPixel);
-		    if (color==Color.BLACK.getRGB()){
-			counter++;
-			Pixel pix = new Pixel(xPixel, yPixel, grayscale, false);
-			if (syms.size() != 0){
-			    outerloop:
-			    for (int i = 0; i < syms.size(); i++){
-          			if (syms.get(i).searchSymbol(pix)==true){
-				    merge1index = i;
-				    for (int j = syms.size()-1; j >= 0; j--){
-					if (syms.get(j).searchSymbol(pix)==true){
-					    value = true;
-					    if(i!=j){
-						merge2index=j;
-						syms=merge(syms, i, j, pix);
-						merge1index = merge2index = -1;
-						break outerloop;
-					    }else{
-						syms.get(i).addPixel(pix);
-						break outerloop;
+		    int color = img.getRGB(xPixel, yPixel); // Get Color
+		    if (color==Color.BLACK.getRGB()){	    // If color is Black
+			counter++;			    // Incremeant the number of black pixels
+			Pixel pix = new Pixel(xPixel, yPixel, grayscale, false); // create Pixel Object
+			if (syms.size() != 0){ // If we have more than 1 symbol
+			    outerloop:	       // Label for breaking out of loop
+			    for (int i = 0; i < syms.size(); i++){ // Iterate through the symbols
+          			if (syms.get(i).searchSymbol(pix) == true){ // If Pixel has a neighbour in this symbol
+				    merge1index = i; // If we have to merge keep this index
+				    for (int j = syms.size()-1; j >= 0; j--){ // Check if neighbour exists in a different symbol
+					if (syms.get(j).searchSymbol(pix) == true){ // If it does
+					    value = true; // Tell Program not to create new Symbol
+					    if (i != j){ // Make sure this symbol isn't the same symbol
+						merge2index = j; // To merge i with j
+						syms = merge(syms, i, j, pix); // Meging two symbols
+						merge1index = merge2index = -1; // reset merge indicies
+						break outerloop; // Break out of loop
+					    } else {		 // If i and j are the same
+						syms.get(i).addPixel(pix); // Just add the pixel to Symbol i
+						break outerloop; // leave loop
 					    }
-
 					}
 				    }
-
-          			} else {
-				    value = false;
+          			} else { // If no neighbours 
+				    value = false; // Tell Program to create new Symbol 
           			}
-
 			    }
-
-			    if (value != true){
-          			Symbol s = new Symbol( pix );
-          			syms.add(s);
-
+			    if (value != true){ // Check if we have to create new symbo
+          			Symbol s = new Symbol( pix ); // Create new Symbol
+          			syms.add(s);		      //  Add Symbol to list of Symbols
 			    }
-
+			// If no symbols exist
 			} else {
-			    Symbol s = new Symbol(pix);
-			    syms.add(s);
+			    Symbol s = new Symbol(pix); // create new symbol
+			    syms.add(s);		// Add symbol to symbol list
 			}
-
-
 		    }
-
 		}
-
 	    }
+
+	    // The total black pixels in the entire Image
 	    System.out.println("Total number of Black Pixels: " + counter);
 
+	    // Go through all the symbols created
 	    for (int k = 0; k < syms.size(); k++){
+		// Print the number of pixels for each symbol
 		System.out.println("Number of black pixels in symbol " + k + " is " + syms.get(k).listOfPixels.size());
 	    }
-
 	} else {
 	    System.out.println("No Image!");
 	}
-
     }
 
+    // To Scale Down 
     public static void scale_down( BufferedImage img, int inputWidth, int inputHeight, double threshold ){
 
 	BufferedImage newImage = new BufferedImage(inputWidth,inputHeight,BufferedImage.TYPE_INT_RGB);
