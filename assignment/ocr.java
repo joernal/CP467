@@ -35,7 +35,7 @@ public class ocr {
 	String image = "image2.bmp";
 
 	img = get_image(img, image); 
-	img2 = get_image(img2, "num_text.bmp");
+	img2 = get_image(img2, "numbers.bmp");
 	String input = "";
 	
 	do { 
@@ -722,7 +722,6 @@ public class ocr {
 	    int min_pos = 0;
 	    for (int k = 0; k < num_data.size(); k++){
 		double total_distance = 0;
-		System.out.println("We are comparing too: " + k);
 		for (int l = 0; l < featureVector.size(); l++){
 		    double distance = Math.pow((num_data.get(k).get(l)-featureVector.get(l)),2);
 		    total_distance += distance;
